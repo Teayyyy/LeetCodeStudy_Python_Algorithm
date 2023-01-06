@@ -78,5 +78,54 @@ class WordSearch:
 
         return any(DFS(0, [xs[i], ys[i]], visited[:]) for i in range(len(xs)))
 
+    def exist_3(self, board: [[str]], word: str) -> bool:
+        m, n = len(board), len(board[0])  # m rows, n cols
+        print(m, n)
+        # get the same array as visited
+        visited = []
+        for i in range(m):
+            visited.append([False for j in range(n)])
+        # the core DFS
+        def search_DFS(t_i: int, t_j: int, count: int) -> bool:
+            # if visited do nothing
+            print("t_i: {}, t_j: {}".format(t_i, t_j))
+            if visited[t_i][t_j]:
+                return False
+            elif board[t_i][t_j] != word[count]:
+                return False
+            else:  # board[i][j] == word[count]
+                # if all characters in word shows up
+                if count == len(word) - 1:
+                    return True
+
+                visited[t_i][t_j] = True
+                count += 1
+                # begin DFS, up down left right
+                directions = []
+                if t_i - 1 >= 0:
+                    directions.append([t_i - 1, t_j])
+                if t_i + 1 <= m - 1:
+                    directions.append([t_i + 1, t_j])
+                if t_j - 1 >= 0:
+                    directions.append([t_i, t_j - 1])
+                if t_j + 1 <= n - 1:
+                    directions.append([t_i, t_j + 1])
+                result = any(search_DFS(direction[0], direction[1], count) for direction in directions)
+                visited[t_i][t_j] = False
+                return result
+            pass
+
+        # know which position in board contains the first character in word
+        queue = []
+        for i in range(m):
+            for j in range(n):
+                if word[0] == board[i][j]:
+                    queue.append([i, j])
+        print(queue)
+        # visited the whole queue, using DFS which the details will be evaluated in.
+        return any(search_DFS(single[0], single[1], count=0) for single in queue)
+        pass
+
+
 w = WordSearch()
-print(w.exist_2(board=[["A", "B", "C", "E"], ["S", "F", "C", "S"], ["A", "D", "E", "E"]], word="ABCCED"))
+print(w.exist_3(board=[["C","A","A"],["A","A","A"],["B","C","D"]], word="AAB"))
